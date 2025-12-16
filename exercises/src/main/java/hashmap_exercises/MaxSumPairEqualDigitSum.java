@@ -1,52 +1,63 @@
 package hashmap_exercises;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * LeetCode 2342 - Max Sum of a Pair With Equal Sum of Digits
- *
- * You are given a 0-indexed integer array nums.
- * Find the maximum sum of a pair of numbers (nums[i] + nums[j]) such that
- * the sum of digits of nums[i] is equal to the sum of digits of nums[j],
- * and i != j.
- *
- * If no such pair exists, return -1.
- *
- * Example:
- * nums = [18, 43, 36, 13, 7]
- * digit sums: 9, 7, 9, 4, 7
- * Pairs with same digit sum:
- *   (18, 36) -> sum = 54 with digit sum 9
- *   (43, 7)  -> sum = 50 with digit sum 7
- * Answer: 54
  */
 public class MaxSumPairEqualDigitSum {
 
     /**
      * @param nums input array
      * @return maximum sum of a pair of numbers sharing the same digit sum,
-     *         or -1 if no such pair exists
+     * or -1 if no such pair exists
      */
     public int maximumSum(int[] nums) {
-        // TODO: implement
-        // Common approach:
-        // - For each number, compute its digit sum.
-        // - Use a Map<Integer, Integer> digitSum -> highest number seen with this digit sum.
-        // - For each number:
-        //     if we already have a value for this digit sum,
-        //        update answer with (nums[i] + bestSoFar),
-        //        and update bestSoFar if nums[i] is larger.
-        //     else,
-        //        store nums[i] as bestSoFar.
-        // - Return answer.
-        return -1;
+        // Map: Key = Digit Sum, Value = The largest number seen so far with this digit sum
+        Map<Integer, Integer> maxSumForDigit = new HashMap<>();
+
+        // Initialize the result to -1, as required if no pair is found
+        int maxPairSum = -1;
+
+        for (int num : nums) {
+            // 1. Calculate the canonical key (the digit sum)
+            int dSum = digitSum(num);
+
+            // 2. Check if we have already seen a number with this digit sum
+            if (maxSumForDigit.containsKey(dSum)) {
+
+                // If the key exists, it means we have a potential pair (num, bestSoFar).
+                int bestSoFar = maxSumForDigit.get(dSum);
+
+                // Calculate the sum of the potential pair
+                int currentPairSum = num + bestSoFar;
+
+                // Update the overall maximum pair sum
+                maxPairSum = Math.max(maxPairSum, currentPairSum);
+
+                // IMPORTANT: Update the bestSoFar value for this digit sum.
+                // Since 'num' might be larger than 'bestSoFar', we must store the larger
+                // of the two so that the next number with this digit sum forms the largest
+                // possible pair with the number we store here.
+                maxSumForDigit.put(dSum, Math.max(bestSoFar, num));
+
+            } else {
+                // If the key does not exist, this is the first number seen with this digit sum.
+                // Store it as the 'bestSoFar' (which is just the number itself).
+                maxSumForDigit.put(dSum, num);
+            }
+        }
+
+        return maxPairSum;
     }
 
     /**
-     * Optional helper method:
-     * Computes the sum of digits of a non-negative integer.
+     * Helper method: Computes the sum of digits of a non-negative integer.
      */
     int digitSum(int x) {
-        // TODO (optional): implement and use it from maximumSum
         int sum = 0;
+        // The standard way to get digits: repeatedly take modulo 10 and integer division by 10.
         while (x > 0) {
             sum += x % 10;
             x /= 10;
@@ -54,4 +65,3 @@ public class MaxSumPairEqualDigitSum {
         return sum;
     }
 }
-

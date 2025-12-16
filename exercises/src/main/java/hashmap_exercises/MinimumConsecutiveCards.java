@@ -1,34 +1,50 @@
 package hashmap_exercises;
 
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * LeetCode 2260 - Minimum Consecutive Cards to Pick Up
- *
- * You are given an integer array cards where cards[i] represents the value of the i-th card.
- * You need to pick up a sequence of cards (a contiguous subarray) that contains at least
- * two cards with the same value.
- *
- * Return the minimum length of such a subarray, or -1 if it is impossible.
- *
- * Example:
- * cards = [3, 4, 2, 3, 4, 7] -> answer = 4
- * (e.g., subarray [3, 4, 2, 3] from index 0 to 3)
  */
 public class MinimumConsecutiveCards {
 
     /**
      * @param cards array of card values
      * @return minimum length of a contiguous subarray containing two equal cards,
-     *         or -1 if no such subarray exists
+     * or -1 if no such subarray exists
      */
     public int minimumCardPickup(int[] cards) {
-        // TODO: implement using a Map<Integer, Integer> to track last seen indices
-        // High-level hint:
-        // - Keep a map from cardValue -> lastIndexSeen
-        // - For each index i:
-        //     if cardValue was seen at j, update answer with (i - j + 1)
-        //     then update lastIndexSeen for this cardValue to i
-        // - If you never update the answer, return -1
-        return -1;
+        // Map: Key = Card Value, Value = Last Index where this card value was seen
+        Map<Integer, Integer> lastSeen = new HashMap<>();
+
+        // Initialize the minimum length to a value larger than any possible result.
+        // Since the max length is cards.length + 1, we use Integer.MAX_VALUE.
+        int minLength = Integer.MAX_VALUE;
+
+        // Iterate through the array, using 'i' as the current index
+        for (int i = 0; i < cards.length; i++) {
+            int currentCard = cards[i];
+
+            // 1. Check if the current card has been seen before
+            if (lastSeen.containsKey(currentCard)) {
+
+                // If the card was seen before, its previous index is stored as 'j'
+                int j = lastSeen.get(currentCard);
+
+                // Calculate the length of the current subarray containing a pair.
+                // The length is (current index i) - (previous index j) + 1
+                int currentLength = i - j + 1;
+
+                // Update the overall minimum length found so far
+                minLength = Math.min(minLength, currentLength);
+            }
+
+            // 2. Always update the map to store the current index 'i' as the most recent sighting
+            lastSeen.put(currentCard, i);
+        }
+
+        // 3. Return the result
+        // If minLength is still Integer.MAX_VALUE, no pair was ever found.
+        return (minLength == Integer.MAX_VALUE) ? -1 : minLength;
     }
 }
